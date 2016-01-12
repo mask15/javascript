@@ -1,7 +1,8 @@
 var date = new Date();
 var meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-var festivos = "";
-
+var festivos = {01:[1],05:[1],08:[15],10:[12],11:[1],12:[8]};
+var reyes = 6;
+var navidad = 25;
 $(document).ready(function(){
 	var inicial = "<a href='#close' title='Cerrar' class='close'>X</a>"
 	inicial+= "<table class='tabla'>";
@@ -196,15 +197,34 @@ $(document).ready(function(){
 						}
 					}
 					else{
+						
 						if (i==date.getDate() && date.getFullYear() == $("#años").html() && date.getMonth()+1 == mes){
 							dias+="<td id='tdDia' class='hoy'>"+i+"</td>"
 						}
+							
 						else{
 							if (i==juevesSanto && parseInt(mes) == parseInt(mesJ) || i==viernesSanto && parseInt(mes) == parseInt(mesV)){
 								dias+="<td id='tdDia' class='festivo'>"+i+"</td>";
 							}
 							else{
-								dias+="<td id='tdDia'>"+i+"</td>";
+								if (isset(festivos[date2.getMonth()+1])){
+									for (n=0;n<festivos[date2.getMonth()+1].length;n++){
+										if (festivos[parseInt(mes)][n]==i){
+											dias+="<td id='tdDia' class='festivo'>"+i+"</td>";
+										}
+										else{
+											if (parseInt(mes)==1 && i==reyes || parseInt(mes)==12 && i==navidad){
+												dias+= "<td id='tdDia' class='festivo'>"+i+"</td>";
+											}
+											else{
+												dias+="<td id='tdDia'>"+i+"</td>";
+											}
+										}
+									}
+								}
+								else{
+									dias+="<td id='tdDia'>"+i+"</td>";
+								}
 							}
 						}
 					}
@@ -215,6 +235,7 @@ $(document).ready(function(){
 				dias+= "<td class='vacio'></td>";
 			}
 		}
+
 		dias+="</tr>";
 		$("#dias").after(dias);
 
@@ -234,5 +255,11 @@ $(document).ready(function(){
 		});
 	}
 
-
-
+	function isset(element) {
+	    if (element==undefined){
+	    	return false;
+	    }
+	    else{
+	    	return true;
+	    }
+	}
