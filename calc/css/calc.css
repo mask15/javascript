@@ -1,0 +1,75 @@
+@font-face{
+	font-family: calc;
+	src: url(../fonts/digital-7.ttf);
+}
+.calc{
+	margin-top: 5% !important;
+	margin: 0 auto;
+	width: 350px;
+	min-height: 400px;
+	border: 1px solid #000;
+	border-radius: 10px;	
+	background: #E6E3E3;
+}
+.container{
+	margin: 30px 30px 30px 30px;
+}
+.texto{
+	background-color: #fff;
+	font-family: calc;
+	color: #7A7A7A;
+	font-size: 20pt;
+	min-height: 30px;
+	max-height: 60px;
+	border: 1px solid #bdbdbd;
+	border-radius: 5px;
+	text-align: right;
+	padding-top: 5px;
+	padding-right: 5px;
+	margin-right: 5px !important;
+	overflow: auto;
+}
+.texto:hover{
+	cursor: text;
+}
+.separador{
+	margin-top: 20px;
+}
+.btn{
+	width: 60px;
+	height: 40px;
+	margin-right: 12px;
+	cursor: pointer;
+	border: 1px solid;
+	box-shadow: 0px 0px 5px #878888;
+	border-radius: 5px;
+}
+.btn:hover, .btn-lg:hover{
+	border-color: #20A3FF;
+	box-shadow: 0px 0px 5px #20A3FF;
+}
+.btn:focus, .btn-lg:focus{
+	box-shadow: inset 0px 0px 0px #878888 !important;
+	box-shadow: 0px 0px 5px #878888 !important;
+}
+.btn:active, .btn-lg:active{
+	box-shadow: 0px 0px 5px #20A3FF !important;
+	box-shadow: inset 1px 1px 5px #878888 !important;
+}
+.btn:last-child{
+	margin-right: 0px;
+}
+.btn-lg{
+	width: 100%;
+	height: 50px;
+	cursor: pointer;
+	border: 1px solid;
+	box-shadow: 0px 0px 5px #878888;
+	border-radius: 5px;
+}
+
+.btnSum, .btnRest, .btnMult, .btnDiv, .btn-lg{
+	font-size: 14pt;
+	font-family: sans-serif;
+	background-color: #F5DB9E;
+}

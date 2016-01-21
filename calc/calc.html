@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="css/calc.css">
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/jquery.numeric.js"></script>
+</head>
+<body>
+	<div class="calc">
+		<div class="container">
+			<div class="texto" contentEditable>0</div>
+			<div class="botones">
+
+				<div class="separador">					
+					<button class="btn btnNum">1</button>
+					<button class="btn btnNum">2</button>
+					<button class="btn btnNum">3</button>
+					<button class="btn btnSum">+</button>
+				</div>
+				<div class="separador">
+					<button class="btn btnNum">4</button>
+					<button class="btn btnNum">5</button>
+					<button class="btn btnNum">6</button>
+					<button class="btn btnRest">-</button>
+				</div>
+				<div class="separador">
+					<button class="btn btnNum">7</button>
+					<button class="btn btnNum">8</button>
+					<button class="btn btnNum">9</button>
+					<button class="btn btnDiv">/</button>
+				</div>
+				<div class="separador">					
+					<button class="btn btnNum">.</button>
+					<button class="btn btnNum">0</button>
+					<button class="btn btnCE">CE</button>
+					<button class="btn btnMult">x</button>
+				</div>
+				<div class="separador">
+					<button class="btn-lg">=</button>
+				</div>
+			</div>
+		</div>
+		<input type="hidden" name="valorAnterior">
+		<input type="hidden" name="operacion">
+	</div>
+	<script type="text/javascript" src="js/calc.js"></script>
+</body>
+</html>
