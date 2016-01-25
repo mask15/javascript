@@ -1,0 +1,66 @@
+<html>
+<head>
+	<title>Rotulo</title>
+</head>
+<script type="text/javascript">
+	<!--
+	var frase = "Frase de pruebas, para comprobar que se va moviendo dentro del panel           "
+	var funciona = true
+	tempo=setInterval("rodar()",100) //100 milisegundos
+
+	function rodar(){
+		primera=frase.substr(0,1)
+		resto=frase.substr(1)
+		frase=resto+primera
+		document.getElementById("panel").value=frase
+		
+	}
+	function cambiaColorFondo(){
+		c=calculaColor()
+		document.getElementById("panel").style.backgroundColor=c
+		document.getElementById("fondo").innerHTML="Color de fondo: "+c
+	}
+	function cambiaColorLetra(){
+		c=calculaColor()
+		document.getElementById("panel").style.color=c
+		document.getElementById("letra").innerHTML="Color de letra: "+c
+	}
+
+	function calculaColor(){
+		r=Math.floor(Math.random()*255).toString(16)
+		g=Math.floor(Math.random()*255).toString(16)
+		b=Math.floor(Math.random()*255).toString(16)
+		if (r.length==1)
+			r="0"+r;
+		if (g.length==1)
+			g="0"+g;
+		if (b.length==1)
+			b="0"+b;
+
+		return "#"+r+g+b
+	}
+
+	function parar(){
+		funciona=!funciona
+		if (funciona){
+			tempo=setInterval("rodar()",200)
+			document.getElementById("para").value="Parar Letrero"
+		}
+		else{
+			clearInterval(tempo)
+			document.getElementById("para").value="Activar Letrero"
+		}
+
+	}
+	// -->
+</script>
+<body>
+	<center><input type="text" size="30" id="panel" /><br><br>
+	<br><input type="button" value="Cambiar color de fondo" onClick="cambiaColorFondo()" />
+	<input type="button" value="Cambiar color de letra" onClick="cambiaColorLetra()" /><br>
+	<br><span id="fondo"></span>
+	<br><span id="letra"></span><br><br>
+	<input type="button" id="para" value="Parar Letrero" onClick="parar()" />
+	</center>
+</body>
+</html>
