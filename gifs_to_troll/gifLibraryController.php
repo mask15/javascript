@@ -21,15 +21,16 @@ class GifLibrary
     {
         $where = (empty($category)) ? '' : 'INNER JOIN gifs_categories gc ON g.gif_id = gc.gif_id WHERE gc.category_id IN (' . $category . ')';
 
-        $sql = 'SELECT g.gif_id, g.gif_name, g.gif_link, g.gif_desc FROM gifs g ' . $where;
+        $sql = 'SELECT g.gif_id, g.gif_name, g.gif_link FROM gifs g ' . $where;
         $res = $this->db->query($sql);
         return $res->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getGifById($id)
     {
-        $sth = $this->db->prepare('SELECT * FROM gifs WHERE gif_id = ?');
-        $sth->execute([$id]);
+        $sth = $this->db->prepare('SELECT * FROM gifs WHERE gif_id = :id');
+        $sth->bindParam(':id', $id, PDO::PARAM_INT);
+        $sth->execute();
         $res = $sth->fetchAll();
         return $res;
     }
