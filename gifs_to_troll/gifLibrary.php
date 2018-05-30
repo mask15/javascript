@@ -305,14 +305,15 @@ $library = new GifLibrary();
     <div class="csvImport">
         <div class="input__row">
             <form action="gifLibraryController.php" method="post" enctype="multipart/form-data">
-            <span>Importar Fichero CSV</span>
+            <span>Importar Fichero CSV</span><br>
             <div class="input__row uploader">
                 <div id="inputval" class="input-value"></div>
                 <label for="fileImport"></label>
                 <input id="fileImport" name="fileCsv" id="fileCsv" class="upload" type="file" accept=".csv">
             </div>
-            <input type="submit" name="cargaCsv" value="Cargar CSV">
+            <button type="submit" name="cargaCsv">Cargar CSV</button>
             </form>
+            <fieldset><legend> Formato del CSV </legend><code>gifName;gifLink;categoryName;categoryDesc</code></fieldset>
         </div>
     </div>
 
