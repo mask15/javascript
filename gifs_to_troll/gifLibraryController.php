@@ -65,14 +65,16 @@ class GifLibrary
 
     public function generateGif($data)
     {
+        $name = $data['gif_name'];
+        $link = $data['gif_link'];
+
         $this->db->beginTransaction();
 
         $sth = $this->db->prepare("INSERT INTO gifs (gif_name,gif_link) VALUES (:name, :link)");
-        $sth->bindParam(':name', $data['gif_name'], PDO::PARAM_STR);
-        $sth->bindParam(':link', $data['gif_link'], PDO::PARAM_STR);
+        $sth->bindValue(':name', $name, PDO::PARAM_STR);
+        $sth->bindValue(':link', $link, PDO::PARAM_STR);
         $sth->execute();
         $gif = $this->db->lastInsertId();
-
         if (!empty($gif)) {
             if (!empty($data['category_id'])) {
                 $sth2 = $this->db->prepare('INSERT INTO gifs_categories (gif_id,category_id) VALUES (:gifId, :catId)');
@@ -96,6 +98,21 @@ class GifLibrary
         return true;
     }
 
+    public function generateCategory($data)
+    {
+        $catName = $data['category_name'];
+        $catDesc = $data['category_desc'];
+
+        $sth = $this->db->prepare('INSERT INTO categories (category_name,category_desc) VALUES (:name, :descr)') ;
+        $sth->bindValue(':name', $catName, PDO::PARAM_STR);
+        $sth->bindValue(':descr', $catDesc, PDO::PARAM_STR);
+        $sth->execute();
+
+        $category = (!empty($this->db->lastInsertId())) ? $this->db->lastInsertId() : false;
+
+        return $category;
+    }
+
     public function insertGif($data)
     {
         $res['result'] = $this->generateGif($data);
@@ -108,16 +125,60 @@ class GifLibrary
         echo json_encode($res);
     }
 
-    public function generateCategory($data)
+    public function getCategoryId($name)
     {
-        $sth = $this->db->prepare('INSERT INTO categories (category_name,category_desc) VALUES (:name, :descr)') ;
-        $sth->bindParam(':name', $data['category_name'], PDO::PARAM_STR);
-        $sth->bindParam(':descr', $data['category_desc'], PDO::PARAM_STR);
+        $sth = $this->db->prepare('SELECT category_id FROM categories WHERE category_name = :name');
+        $sth->bindParam(':name', $name, PDO::PARAM_STR);
         $sth->execute();
+        $res = $sth->fetchAll();
 
-        $category = (!empty($this->db->lastInsertId())) ? $this->db->lastInsertId() : false;
+        return $res[0]['category_id'];
+    }
 
-        return $category;
+    public function getGifByLink($link)
+    {
+        $sth = $this->db->prepare('SELECT gif_id FROM gifs WHERE gif_link = :link');
+        $sth->bindParam(':link', $link, PDO::PARAM_STR);
+        $sth->execute();
+        $res = $sth->fetchAll();
+
+        return $res[0]['gif_id'];
+    }
+
+    public function loadFile($data)
+    {
+        foreach ($data as $pos => $info) {
+            $gifName = $info[0];
+            $gifLink = $info[1];
+            $categoryName = $info[2];
+            $categoryDesc = $info[3];
+
+            $category = [
+                'category_name' => $categoryName,
+                'category_desc' => $categoryDesc
+            ];
+
+            $category_id = $this->getCategoryId($category['category_name']);
+
+            if (empty($category_id)) {
+                $category_id = $this->generateCategory($category);
+            }
+
+            $gif = [
+                'gif_name' => $gifName,
+                'gif_link' => $gifLink,
+                'category_id' => (int) $category_id
+            ];
+
+            $gifId = $this->getGifByLink($gif['gif_link']);
+            
+            if (empty($gifId)) {
+                $this->generateGif($gif);
+            }
+
+        }
+        
+        header('Location: gifLibrary.php');
     }
 }
 
@@ -155,6 +216,17 @@ if (isset($_POST['catName'])) {
     ];
 
     $gifLib->insertCategory($data);
+}
+
+if (isset($_FILES['fileCsv'])) {
+    $tmpFile = $_FILES['fileCsv']['tmp_name'];
+    $file = fopen($tmpFile, 'r');
+
+    while ($row = fgetcsv($file, 0, ';')) {
+        $data[] = $row;
+    }
+
+    $gifLib->loadFile($data);
 }
 
 ?>

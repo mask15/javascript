@@ -22,7 +22,7 @@ $library = new GifLibrary();
             width: 100%;
             border-spacing: 5px;
         }
-        .tableGifs input, .tableCategories input, .tableCategories textarea, .tableGifs textarea, .tableGifs select, .tableCategories select {
+        .tableGifs input, .tableCategories input, .tableCategories textarea, .tableGifs textarea {
             width: 100%;
             padding: 5px;
         }
@@ -53,10 +53,46 @@ $library = new GifLibrary();
             position: relative;
             display: inline-block;
         }
-        div.categoriesForm, div.gifsForm {
+        div.categoriesForm, div.gifsForm, div.csvImport {
             display: none;
             margin-top: 5%;
         }
+
+        .input__row{
+          margin-top: 10px;
+        }
+        label:hover {
+            cursor: pointer;
+        }
+        .upload {
+            display: none;
+        }
+        .uploader {
+            border: 1px solid #ccc;
+            width: 60%;
+            position: relative;
+            height: 50px;
+            display: flex;
+        }
+        .uploader .input-value{
+            width: 100%;
+            padding: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 25px;
+            font-family: sans-serif;
+            font-size: 16px;
+        }
+        .uploader label {
+            cursor: pointer;
+            margin: 0;
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            right: 0;
+            background: #c3e3fc url('https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-folder-48.png') no-repeat center;
+        }
+
     </style>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
@@ -70,9 +106,10 @@ $library = new GifLibrary();
                 placeholder: "Selecciona una categoría",
                 allowClear: true
             }).change(function() {
-                $(".gifContainer").show();
                 $(".categoriesForm").hide();
+                $(".csvImport").hide();
                 $(".gifsForm").hide();
+                $(".gifContainer").show();
                 var category_id = $(".category_list").val();
                 $.ajax({
                     url: 'gifLibraryController.php',
@@ -97,13 +134,20 @@ $library = new GifLibrary();
                 });
             });
 
+            $("#gifCategory").select2({
+                placeholder: "Selecciona una categoría",
+                allowClear: true,
+                width: '100%'
+            });
+
             $(".gif_list").select2({
                 placeholder: "Selecciona un gif",
                 allowClear: true
             }).change(function() {
-                $(".gifContainer").show();
                 $(".categoriesForm").hide();
+                $(".csvImport").hide();
                 $(".gifsForm").hide();
+                $(".gifContainer").show();
                 var gif_id = $(".gif_list").val();
                 $.ajax({
                     url: 'gifLibraryController.php',
@@ -117,6 +161,7 @@ $library = new GifLibrary();
 
             $("#addCategory").click(function() {
                 $(".gifContainer").hide();
+                $(".csvImport").hide();
                 $(".gifsForm").hide();
                 $(".categoriesForm").show();
                 $(".saveCategory").click(function() {
@@ -134,8 +179,20 @@ $library = new GifLibrary();
 
             });
 
+            $("#importCsv").click(function() {
+                $(".gifContainer").hide();
+                $(".categoriesForm").hide();
+                $(".gifsForm").hide();
+                $(".csvImport").show();
+                $('#fileImport').change(function(){
+                    var inputValue = $(this).val().replace("C:\\fakepath\\", "");
+                    $('#inputval').text(inputValue);
+                 });
+            });
+
             $("#addGif").click(function() {
                 $(".gifContainer").hide();
+                $(".csvImport").hide();
                 $(".categoriesForm").hide();
                 $(".gifsForm").show();
                 $(".saveGif").click(function() {
@@ -196,6 +253,9 @@ $library = new GifLibrary();
     <button id="addCategory">Añadir Categoría</button>
     <div class="separator"></div>
     <button id="addGif">Añadir Gif</button>
+    <div class="separator"></div>
+    <button id="importCsv">Importar CSV</button>
+
     <br>
 
     <div class="gifContainer"></div>
@@ -242,5 +302,19 @@ $library = new GifLibrary();
             </tr>
         </table>
     </div>
+    <div class="csvImport">
+        <div class="input__row">
+            <form action="gifLibraryController.php" method="post" enctype="multipart/form-data">
+            <span>Importar Fichero CSV</span>
+            <div class="input__row uploader">
+                <div id="inputval" class="input-value"></div>
+                <label for="fileImport"></label>
+                <input id="fileImport" name="fileCsv" id="fileCsv" class="upload" type="file" accept=".csv">
+            </div>
+            <input type="submit" name="cargaCsv" value="Cargar CSV">
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>
