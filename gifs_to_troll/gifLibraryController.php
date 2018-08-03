@@ -1,49 +1,22 @@
 <?php
 
+require_once 'gifLibraryModel.php';
 class GifLibrary
 {
-
-    function __construct()
+    public function __construct()
     {
-        $this->db = new PDO('mysql:host=localhost;dbname=giphy;charset=utf8mb4', 'okn-user', 'okn-pass');
-        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    }
-
-    public function getCategories()
-    {
-        $sth = $this->db->prepare('SELECT * FROM categories');
-        $sth->execute();
-        $res = $sth->fetchAll();
-        return $res;
-    }
-
-    public function getGifs($category = NULL)
-    {
-        $where = (empty($category)) ? '' : 'INNER JOIN gifs_categories gc ON g.gif_id = gc.gif_id WHERE gc.category_id IN (' . $category . ')';
-
-        $sql = 'SELECT g.gif_id, g.gif_name, g.gif_link FROM gifs g ' . $where;
-        $res = $this->db->query($sql);
-        return $res->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function getGifById($id)
-    {
-        $sth = $this->db->prepare('SELECT * FROM gifs WHERE gif_id = :id');
-        $sth->bindParam(':id', $id, PDO::PARAM_INT);
-        $sth->execute();
-        $res = $sth->fetchAll();
-        return $res;
+        $this->model = new GifLibraryModel();
     }
 
     public function showGifsBycategory($category)
     {
-        $gifs = $this->getGifs($category);
+        $gifs = $this->model->getGifs($category);
         $this->printTable($gifs);
     }
 
     public function showSelectedGif($gif_id)
     {
-        $gifs = $this->getGifById($gif_id);
+        $gifs = $this->model->getGifById($gif_id);
         $this->printTable($gifs);
     }
 
@@ -58,93 +31,33 @@ class GifLibrary
 
     public function fillGifsSelect($category)
     {
-        $gifs = $this->getGifs($category);
+        $gifs = $this->model->getGifs($category);
 
         echo json_encode($gifs);
     }
 
-    public function generateGif($data)
-    {
-        $name = $data['gif_name'];
-        $link = $data['gif_link'];
-
-        $this->db->beginTransaction();
-
-        $sth = $this->db->prepare("INSERT INTO gifs (gif_name,gif_link) VALUES (:name, :link)");
-        $sth->bindValue(':name', $name, PDO::PARAM_STR);
-        $sth->bindValue(':link', $link, PDO::PARAM_STR);
-        $sth->execute();
-        $gif = $this->db->lastInsertId();
-        if (!empty($gif)) {
-            if (!empty($data['category_id'])) {
-                $sth2 = $this->db->prepare('INSERT INTO gifs_categories (gif_id,category_id) VALUES (:gifId, :catId)');
-                $sth2->bindParam(':gifId', $gif, PDO::PARAM_INT);
-                $sth2->bindParam(':catId', $data['category_id'], PDO::PARAM_INT);
-                $sth2->execute();
-
-                $relation_id = $this->db->lastInsertId();
-
-                if (empty($relation_id)) {
-                    $this->db->rollBack();
-                    return false;
-                }
-            }
-
-        } else {
-            $this->db->rollBack();
-            return false;
-        }
-        $this->db->commit();
-        return true;
-    }
-
-    public function generateCategory($data)
-    {
-        $catName = $data['category_name'];
-        $catDesc = $data['category_desc'];
-
-        $sth = $this->db->prepare('INSERT INTO categories (category_name,category_desc) VALUES (:name, :descr)') ;
-        $sth->bindValue(':name', $catName, PDO::PARAM_STR);
-        $sth->bindValue(':descr', $catDesc, PDO::PARAM_STR);
-        $sth->execute();
-
-        $category = (!empty($this->db->lastInsertId())) ? $this->db->lastInsertId() : false;
-
-        return $category;
-    }
-
     public function insertGif($data)
     {
-        $res['result'] = $this->generateGif($data);
+        $res['result'] = $this->model->generateGif($data);
         echo json_encode($res);
     }
 
     public function insertCategory($data)
     {
-        $res['result'] = $this->generateCategory($data);
+        $res['result'] = $this->model->generateCategory($data);
         echo json_encode($res);
     }
 
-    public function getCategoryId($name)
+    public function getCategories()
     {
-        $sth = $this->db->prepare('SELECT category_id FROM categories WHERE category_name = :name');
-        $sth->bindParam(':name', $name, PDO::PARAM_STR);
-        $sth->execute();
-        $res = $sth->fetchAll();
-
-        return $res[0]['category_id'];
+        return $this->model->getCategories();
     }
-
-    public function getGifByLink($link)
+    
+    public function getGifs()
     {
-        $sth = $this->db->prepare('SELECT gif_id FROM gifs WHERE gif_link = :link');
-        $sth->bindParam(':link', $link, PDO::PARAM_STR);
-        $sth->execute();
-        $res = $sth->fetchAll();
-
-        return $res[0]['gif_id'];
+        return $this->model->getGifs();
     }
-
+    
     public function loadFile($data)
     {
         foreach ($data as $pos => $info) {
@@ -158,10 +71,10 @@ class GifLibrary
                 'category_desc' => $categoryDesc
             ];
 
-            $category_id = $this->getCategoryId($category['category_name']);
+            $category_id = $this->model->getCategoryId($category['category_name']);
 
             if (empty($category_id)) {
-                $category_id = $this->generateCategory($category);
+                $category_id = $this->model->generateCategory($category);
             }
 
             $gif = [
@@ -170,12 +83,11 @@ class GifLibrary
                 'category_id' => (int) $category_id
             ];
 
-            $gifId = $this->getGifByLink($gif['gif_link']);
+            $gifId = $this->model->getGifByLink($gif['gif_link']);
             
             if (empty($gifId)) {
-                $this->generateGif($gif);
+                $this->model->generateGif($gif);
             }
-
         }
         
         header('Location: gifLibrary.php');
@@ -184,7 +96,7 @@ class GifLibrary
 
 $gifLib = new GifLibrary();
 
-if (isset($_POST['category'])){
+if (isset($_POST['category'])) {
     $category = $_POST['category'];
     $gifLib->showGifsBycategory($category);
 }
@@ -228,5 +140,3 @@ if (isset($_FILES['fileCsv'])) {
 
     $gifLib->loadFile($data);
 }
-
-?>
